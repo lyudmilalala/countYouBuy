@@ -1,0 +1,36 @@
+apiVersion: apps/v1 # for versions before 1.9.0 use apps/v1beta2
+kind: Deployment
+metadata:
+  name: redis-master-dpl
+  labels:
+    app: guestbook
+spec:
+  selector:
+    matchLabels:
+      app: redis
+      role: master
+      tier: backend
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      # only allow at most one pod unavailable for work
+      maxUnavailable: 1
+      # can have no more than one extra pod
+      maxSurge: 1
+  template:
+    metadata:
+      labels:
+        app: redis
+        role: master
+        tier: backend
+    spec:
+      containers:
+      - name: redis-master
+        image: lyudmila/redis-master:v1.0
+        resources:
+          requests:
+            cpu: 100m
+            memory: 100Mi
+        ports:
+        - containerPort: 6379
